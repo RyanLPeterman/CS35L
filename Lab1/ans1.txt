@@ -1,0 +1,166 @@
+Name: Ryan Peterman
+UID: 704269982
+
+1. How can you get man to print all the commands that have a specific word in
+ their man page (or at least the description part of the man page)? 
+
+	man -k <specific word> -prints out all man pages that have the specific word
+	in their short description or name
+
+	man -k is the same as apropos which from its man page description searches 
+	the whatis database for strings
+
+2. Where are the cp and wc programs located in the file system?
+
+	$ whereis cp
+	cp: /bin/cp /usr/share/man/man1/cp.1.gz /usr/share/man/man1p/cp.1p.gz
+
+	$ whereis wc 
+	wc: /usr/bin/wc /usr/share/man/man1/wc.1.gz /usr/share/man/man1p/wc.1p.gz
+
+3. What executable programs have names that are just one character long, and 
+what do they do?
+	
+	to find all executables we can use find command containing the special 
+	character ? (wild card) which represents any character:
+	$ find / -executable -name ?
+		outputs: many lines into std out (was told I didn't need to explain 
+		what they did)
+
+4. When you execute the command named by the symbolic link /usr/bin/cc, which
+ file actually is executed?
+
+	The file that is actually executed is /usr/bin/gcc
+	This is evidenced by the following (inside /usr/bin):
+	
+	$ ls -l gcc    		   (shows us that cc is a softlink)
+	$ readlink -f gcc      (output that the softlink points to /usr/bin/gcc)
+	
+	From the man page: readlink - print value of a symbolic link or 
+	canonical file name
+
+5. The chmod program changes permissions on a file. What does the symbolic
+ mode g-s mean, in terms of permissions?
+
+	$ chmod g-s file.txt
+		- this is using the setgid functionality of chmod, which changes the 
+		permission of the file such that it matches the permissions of the 
+		group owner of the file
+
+6. What option to find lets you search for files that have been modified in 
+the last 3 days?
+
+	find / -mtime -3
+	this command prints out all the files in the file system that have been 
+	modified in the past 3 days
+
+7. Use the previous answer to find all directories modified in the last 3 days.
+
+	$ find -mtime -3 -type d
+
+8. Of the files in the same directory as find, how many of them are symbolic 
+links?
+	
+	To find where find is: $ whereis find
+	  this outputs -> /bin/find
+	To find how many of them are symbolic links:
+		The text for a symbolic link is blue so counting them gives me 18
+	To do it more systematically:
+		$ ls -la /bin/ | grep "\->" | wc -l
+			1. lists information about all the files in /bin/
+			2. sorts the lines by the -> (only soft links have)
+			3. outputs the lines counted (outputs 18)
+
+9. What is the oldest regular file in the /usr/lib directory?
+
+	$ find /usr/lib -type f -printf '%T+ %p\n' | sort | head -n 1
+
+	-type f specifies regular files
+	-printf prints the format string after it
+		%T+ prints the 24 hour time with the Data and time seperated by +
+		%p prints files name
+	We then pipe it to sort which sorts each line by their date
+	Then we pipe it to head which outputs the first line of the piped data 
+	using the -n 1 flag
+
+	Output: 2003-08-29+12:56:11.0000000000 ./x86_64-redhat-linux5E/include/
+	bits/stdio-lock.h
+
+10. Where does the locale command get its data from?
+
+	The locale command gets its data defined by the LC_* environment variables
+
+11. In Emacs, what commands have sort in their name?
+
+	To find which commands we can use the following command: C-h a sort in emacs
+	This outputs the following commands:
+	
+		Buffer-menus-sort
+		Buffer-menu-sort-by-column
+		ibuffer-invert-sorting
+		ibuffer-toggle-sorting-mode 
+		rmail-sort-by-author
+		rmail-sort-by-correspondent
+		rmail-sort-by-date
+		rmail-sort-by-lables
+		rmail-sort-by-lines
+		rmail-sort-by-recipient
+		rmail-sort-by-subject
+		sort-columns
+		sort-fields
+		sort-lines
+		sort-numeric-fields
+		sort-pages
+		sort-paragraphs
+		sort-regexp-fields
+	
+12. Briefly, what do the Emacs keystrokes C-a through C-z do? Can you list 
+their actions concisely?
+
+	C-a 	go to beginning of line
+	C-b 	move one character backward
+	C-c 	used with C-x C-c to exit Emacs permanently
+	C-d		deleting a character forward
+	C-e		go to end of line
+	C-f		move one character forward
+	C-g		abort partially typed or executing command
+	C-h		start the help system
+	C-i		used with C-h C-i to find specified function or variable in Info
+	C-k		kill a line forward
+	C-l		redraw garbaged screen
+	C-m		insert new line and move to it
+	C-n 	move forward over a line
+	C-o		insert newline after point
+	C-p		move backward over a line
+	C-q		Used with C-x C-q for version control checkin/checkout
+	C-r		search backward
+	C-s		search forward
+	C-t		transpose characters
+	C-u		print the following character multiple times
+	C-v		scroll to next screen
+	C-w		kill region
+	C-x		combines with other commands
+	C-y		yank back last thing killed
+	C-z		suspend Emacs 
+
+13. In more detail, what does the Emacs keystroke C-g do?
+
+	The C-g command aborts a partially typed or executing command. For example
+	when a command is entered before the command can be processed or while it 
+	is processed you can press C-g to in effect throw an execption to stop 
+	emacs from doing what it was doing.
+
+14 What does the Emacs yank function do?
+
+	The yank function inserts text from the kill (cut) ring after the string 
+	is processed by the yank-handler (paste) (similar to cut and paste).
+
+15. When looking at the directory /usr/bin, what's the difference between the 
+output of the ls -l command, and the directory listing of the Emacs 
+dired command?
+
+	The difference between the two is that you can see the parent directory
+	in the Emacs dired command
+	
+	M-x dired enter /usr/bin in emacs vs in the shell
+	/usr/bin -l

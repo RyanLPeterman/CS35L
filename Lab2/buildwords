@@ -1,0 +1,29 @@
+#! /bin/bash
+# CS35L Project 2
+# Name: Ryan Peterman
+# UID: 704269982
+# Section: Lab 3
+
+# contains the hfile passed in to standard input
+html_file=$1
+
+# Matches things only between td tags in html
+grep "<td>.*</td>" $html_file | \
+# use tr to remove horizontal whitespace
+tr -d [:blank:]  | \
+# Now remove tags
+sed "s/<[^>]*>//g" | \
+# use tr to remove additional whitespace
+tr -s '\n' | \
+# remove every other line for english words
+awk '!(NR%2)' | \
+# replace grave symbol with regular '
+sed -r 's/`/'"'"'/g' | \
+# change all uppercase to lower case
+tr '[:upper:]' '[:lower:]' | \
+# treat all commas as newlines
+tr , '\n' | \
+# sort the list
+sort -u | \
+# remove every line character that isnt in the hawaiian language (one word has a-) in it is it okay to delete this line?
+sed '/[^p^k^m^n^w^l^h^a^e^i^o^u^'\'']/d'

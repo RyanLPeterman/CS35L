@@ -1,0 +1,74 @@
+Name: Ryan Peterman
+UID: 704269982
+
+Exercise 1.1 (Omitting numbers pertaining to insns with no keylogging):
+2. C-s A S C I I
+3. Backspace Backspace Backspace Backspace Backspace I n s t r u c t i o n s 
+	- no need for backward search since backspacing brought us back to the top
+4. Backspace Backspace Backspace Backspace Backspace Backspace Backspace 
+Backspace Backspace Backspace Backspace Backspace H T M L
+5. Backspace Backspace Backspace Backspace H u n t 
+6. C-e
+7. C-a
+8. M-<
+9. See above
+10. See above
+11. C-x C-c
+
+Exercise 1.2:
+2.C-s < ! C-s C-a C-k
+3. C-s D E C-a C-k
+4. C-s < ! C-a C-k C-n C-k C-n C-k
+5. C-s < ! rightarrow rightarrow rightarrow rightarrow rightarrow Backspace
+ Backspace Backspace Backspace Backspace Backspace Backspace 
+
+Exercise 1.3:
+2. C-s A s s i g n m e n t SP 1 rightarrow leftarrow backspace 3 7 C-s A s s 
+i g n m e n t SP 1 rightarrow leftarrow backspace 3 7 
+3. C-r U T F DEL DEL DEL DEL DEL U S - A S C I I
+4. C-s < o l C-e ENTER
+
+Exercise 1.4:
+3. M-> C-r - < leftarrow C-k C-r < p > s h o u l d uparrow C-y downarrow M-0 C-k
+M-> C-r - < ! leftarrow C-k C-r < h 2 C-r C-r C-r downarrow C-y 
+C-s < h t t p : leftarrow C-k C-r < h 2 C-r C-r C-r down down C-y
+down - - >
+4. see above lines
+5. C-s - - - e x e r C-a C-sp M-> C-w 
+6. C-x u
+7. M-> - - > C-r - - - left < !
+8. M-% < o l > enter < 0 l > enter y y y y y y
+
+Exercise 1.5:
+1. cd mkdir j u n k 
+2. cd j u n k touch h e l l o . c
+3. M-x compile gcc hello.c -o hello
+4. M-! . / h e l l o C-x C-w h e l l o - o u t 
+5. C-sp M-> C-w C-y
+
+#include <stdio.h>
+int
+main (void)
+{
+  char n = '\n';
+  char b = '\\';
+  char q = '"';
+  char const *p = "#include <stdio.h>%cint%cmain (void)%c{%c  char n = '%cn';%c
+  char b = '%c%c';%c  char q = '%c';%c  char const *p = %c%s%c;%c  printf (p, n,
+  n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);%c  return 0;%c}%c";
+  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);
+  return 0;
+}
+
+Exercise 1.6:
+2. ( r a n d o m ) C-j
+3. ( s e t q x (r a n d o m) ) C-j
+( s e t q y (r a n d o m) ) C-j
+( s e t q z (r a n d o m) ) C-j
+4. ( * x y z )
+product = 643688844779834296 , the result is not the correct mathematical result
+since they each number has the same number of digits (truncation)
+5. The output is the same except there are two numbers in parentheses:
+643688844779834296 (#o43566571401276747640, #x8eed7980afbcfa0)
+6. No the numbers are not truly random, because a deterministic computer program
+can't generate actual random numbers.

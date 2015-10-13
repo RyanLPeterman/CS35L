@@ -1,0 +1,97 @@
+#!/bin/bash
+# CS35L Project 2
+# Name: Ryan Peterman
+# UID: 704269982
+# Section: Lab 3
+
+# set tracking for debugging
+# set -x
+
+# set internal field seperator
+IFS=$'\n'
+
+# store dir argument
+dir=$1
+cd "$dir"
+
+# now contains all the files in the current directory sorted
+reg_list=`ls | sort`
+# contains all the files starting with a dot
+GLOBIGNORE=".:.." # To ignore the current dir and prev dir syms
+dot_list=# CS35L Project 2
+# Name: Ryan Peterman
+# UID: 704269982
+# Section: Lab 3`ls .* | sort`
+
+# create an array to store regular files inside of
+declare -a reg_files
+
+let count=0
+
+# loop through files in dot_list and add them to array
+for file in $dot_list
+do
+	if [ -L "$file" ]
+	then
+		# echo "$dir/$file is a soft link"
+		continue
+	else
+		if [ -f "$file" ]
+		then
+			reg_files[$count]="$file"
+			let count=count+1
+		else
+			echo "dir"
+		fi
+	fi
+done
+
+# loop through files in reg_list add them to array
+for file in $reg_list
+do
+	if [ -L "$file" ]
+	then
+		# echo "$dir/$file is a soft link"
+		continue
+	else
+		if [ -f "$file" ]
+		then
+			reg_files[$count]="$file"
+			let count=count+1
+		else
+			echo "$dir/$file is not a regular file"
+		fi
+	fi
+done
+
+# echo $count
+# echo ${reg_files[*]}
+
+# for iterating among regular files
+let iter=0
+
+# checks regular files for duplicates using cmp
+while [ $iter -lt $count ]
+do
+	# echo "Outer Index: $iter"
+
+	# iterator through remaining files
+	let inner_iter=iter+1
+
+	while [ $inner_iter -lt $count ]
+	do 
+		cmp "${reg_files[$iter]}" "${reg_files[$inner_iter]}"
+
+		# cmp returned 0 and therefore they are the same
+		if [ $? -eq 0 ]
+		then
+			# make hard link
+			ln -f "${reg_files[$iter]}" "${reg_files[$inner_iter]}"
+		fi
+
+		let inner_iter=inner_iter+1
+
+	done
+
+	let iter=iter+1
+done
