@@ -1,0 +1,35 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+1. Grab a copy of the Diffutils repository with the following command:
+	$ git clone git://git.savannah.gnu.org/diffutils.git
+
+2. Grab a copy of the log of changes with the following command:
+	$ git log > git-log.txt
+
+3. Grab a copy of the list of tags used:
+	$ git tags > git-tags.txt
+
+4. Using ctrl-F to find the commit with the text reveals the following:
+	
+	commit 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f
+	Author: Paul Eggert <eggert@cs.ucla.edu>
+	Date:   Wed Jan 25 23:46:16 2012 -0800
+
+Then generate a patch for the commit using the following command:
+	$ git show 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f >quote-patch.txt
+
+5. Checkout version 3.0 of Diffutils with the following command:
+	$ git checkout v3.0
+
+6. Now patch v3.0 using the following command:
+	$ patch -p1 < quote-patch.txt
+		- the p1 command strips one / from the patch dir given
+		- several of the files did not exist and therefore were skipped in
+		patching it with RETURN
+
+7. Now to see which files were modified use the following command:
+	$ git status
+
+8. Whats the point of C-x v = and C-x vu, and which files do i open?

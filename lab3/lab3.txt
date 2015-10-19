@@ -1,0 +1,40 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+1. Download coreutils using the following command:
+	$ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+2. Untar and unzip the downloaded tarball with the following:
+	$ tar -xzvf
+
+3. Now install broken ls in a folder coreutilsInstall:
+	$ mkdir coreutilsInstall
+	$ ./configure --prefix="absolute path"
+	$ make
+	$ make install
+
+4. Now cd into coreutilsInstall and confirm the bug:
+	$ cd coreutilsInstall/bin
+	$ ./ls -l
+
+	This confirms the bug since the dates come out in the following
+	format: YYYY-MM-DD
+
+5. Apply patch with the following command:
+	$ cd coreutils-7.6/src  (this allows us to neglect -pnum flag)
+		-pnum flag affects where the flag is applied relative to
+		the directory specified in the patch by the creator
+			i.e. it strips off slashs from the original dir
+
+	$ patch -p < ../../patch    (patch was in my home dir)
+
+6. Now recompile the code with make and test it on a recently
+modified file with the following commands:
+	$ make
+	$ touch -d '10 Oct 2014' one_year_old
+	$ touch newly_modified
+	$ ./ls -l 
+
+	This reveals that the dates are indeed UNIX format now
+	
