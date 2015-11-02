@@ -1,0 +1,102 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+1. First downloaded the file using the following:
+	$ wget http://web.cs.ucla.edu/classes/fall15/cs35L/assign/
+	coreutils-with-bug.tar.gz
+
+2. Then tried to build the core-utils with the following:
+	$ tar -xzvf coreutils-with-bug.tar.gz
+	$ ./configure
+	$ make <-- this part failed
+
+The error message that make gave:
+
+	In file included from utimecmp.c:41:
+	utimens.h:2: error: conflicting types for 'futimens'
+	/usr/include/sys/stat.h:374: note: previous declaration of 
+	'futimens' was here
+
+We received this error message because there was already a
+declaration of futimens, therefore we can use the patch to rename it.
+
+3. Now we fix the compiler error by applying the renaming patch:
+	$ wget http://web.cs.ucla.edu/classes/fall15/cs35L/assign/coreutils.diff
+	$ patch -p0 < coreutils.diff
+		- this is because we didnt need to strip any /'s
+		- this patched the following:
+		 	lib/utimens.c
+			lib/utimens.h
+			src/copy.c
+			src/tee.c
+			src/touch.c
+
+	$ make 
+		- this command now works
+
+4. Now we test the problem with the contents of my test script:
+
+	$ mkdir tmp
+	$ cd tmp
+	$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+	$ touch now
+	$ sleep 1
+	$ touch now1
+	$ ../ls -lt --full-time wwi-armistice now now1
+	$ cd ..
+	$ rm -fr tmp
+
+This output the following, which confirms the bug:
+	-rw-r--r-- 1 peterman csugrad 0 2054-12-17 09:28:16.000000000 -0800 
+	wwi-armistice
+	-rw-r--r-- 1 peterman csugrad 0 2015-10-26 00:09:16.790496000 -0700 now1
+	-rw-r--r-- 1 peterman csugrad 0 2015-10-26 00:09:15.786131000 -0700 now
+
+5. now we run the gdb on ls with the following
+
+	$ gdb ./ls
+	(gdb) info functions    (to look for relevant starting point)
+	(gdb) break main
+	(gdb) run -lt --full-time wwi-armistice now now1
+
+After some investigation we see that inside of the timespec_cmp function 
+there is arithmetic which has a positive number subtracted by a negative 
+number which results in a large negative number due to overflow, which
+is incorrect.
+
+Inside of lib/timespec.h we see the following:
+	int diff = a.tv_sec - b.tv_sec;
+
+This is an opportunity for integer overflow and therefore we change
+the int to signed long long int and based on the result of it we
+only care if the result is +, - or 0. Therefore based on the result
+we return either 1, -1 or 0.
+
+6. We construct a new patch file for the lab with the following:
+
+	$ emacs timespec.h
+	(emacs) C-x 4 a - (created changelog and added description)
+	$ diff -u timespec_old.h timespec_new.h > lab5.diff
+
+7. Reproduce the problem on SEASnet Linux Servers (in home dir):
+
+	$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+	$ touch now
+	$ sleep 1
+	$ touch now1
+	$ ls -lt --full-time wwi-armistice now now1
+
+Outputs:
+	-rw-r--r-- 1 peterman csugrad 0 2054-12-17 09:28:16.000000000 -0800 
+	wwi-armistice
+	-rw-r--r-- 1 peterman csugrad 0 2015-10-30 17:24:03.398933000 -0700 now1
+	-rw-r--r-- 1 peterman csugrad 0 2015-10-30 17:24:02.394570000 -0700 now
+
+The armistice is sorted as earliest (largest timestamp after Linux Epoch), 
+because SEASnet uses NFS filesystem which represents time stamps as 
+unsigned 32bit ints. Since the date of the WWI armistice is before the
+Linux Epoch it is a negative number that is interpreted as a large positive
+one (far in the future) which ends up causing the wwi-armistice file
+to be sorted to higher in the ls output.
+

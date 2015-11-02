@@ -1,0 +1,25 @@
+--- ChangeLog: Fixed integer overflow error that resulted from arithmetic
+--- timespecbug.h	2015-10-31 13:49:33.618912999 -0700
++++ timespec.h	2015-10-31 14:07:57.790912999 -0700
+@@ -45,8 +45,19 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  // int diff = a.tv_sec - b.tv_sec;
++  // return diff ? diff : a.tv_nsec - b.tv_nsec;
++
++  // store in larger data type to remove potential int overflow
++  signed long long int diff = (signed long long int)a.tv_sec - (signed long long int)b.tv_sec;
++
++  // return -1,0 or 1 based on result of diff
++  if(diff > 0)
++    return 1;
++  if(diff == 0)
++    return 0;
++  else // diff < 0
++    return -1;
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

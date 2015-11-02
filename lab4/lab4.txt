@@ -9,7 +9,7 @@ Section: Lab 3
 	$ git log > git-log.txt
 
 3. Grab a copy of the list of tags used:
-	$ git tags > git-tags.txt
+	$ git tag > git-tags.txt
 
 4. Using ctrl-F to find the commit with the text reveals the following:
 	
@@ -32,4 +32,44 @@ Then generate a patch for the commit using the following command:
 7. Now to see which files were modified use the following command:
 	$ git status
 
-8. Whats the point of C-x v = and C-x vu, and which files do i open?
+9. Now revert all changes to files other than .c files using the following:
+	$ git checkout -- <file> 
+		- do this for NEWS, README, TODO, doc/diagmeet.note, ms/config.bat
+		ms/config.site, po/en.po, tests/help-version
+
+Similarily within .c files if there were any changes applied to comments
+revert the changes by hand using the emacs functions
+	$ emacs <file>
+		to file: cmp.c diff.c diff3.c dir.c sdiff.c util.c
+	in emacs:
+			C-x v = (to show all changes)
+			C-u C-c C-a (to undo a hunk)
+			C-x C-c (to save)
+
+11. Remove all untracked files that git status lists with the following command:
+	$ git clean -f
+
+12. Now generate a patch on the remaining modified files:
+	$ git diff > quote-3.0-patch.txt
+
+13. Now build the resulting version of Diffutils using insns in (README-hacking)
+	$ PATH=/usr/local/cs/bin:$PATH  (so that ./bootstrap can find help2man)
+	$ ./bootstrap
+	$ ./configure
+	$ make
+	$ make check
+	
+	running diff . - outputs error message without backticks:
+	$ cd src
+	$ ./diff . -
+
+14. Now we perform a sanity check on our source code to generate diffs:
+	$ ./diff -pru diffutils-3.0 diffutils-3.0-patch >quote-3.0-test.txt
+	
+15. Compare quote-3.0-test.txt and quote-3.0-patch.txt:
+	$ diff quote-3.0-test.txt quote-3.0-patch.txt
+	
+	This showed that the files are not identical and that the differences
+	did not cause any problems.
+	
+	
