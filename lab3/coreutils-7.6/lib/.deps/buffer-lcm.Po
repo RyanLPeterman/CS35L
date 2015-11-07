@@ -1,0 +1,6 @@
+buffer-lcm.o: buffer-lcm.c buffer-lcm.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h
+
+buffer-lcm.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h:

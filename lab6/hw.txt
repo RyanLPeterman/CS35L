@@ -1,0 +1,57 @@
+Name: Ryan Peterman
+UID: 704269982
+Lab : Section 3
+
+Homework:
+	1. Generate a key pair with:
+		$ gpg --gen-key
+			- asked me for type of key (RSA and RSA default)
+			- keysize (2048)
+			- valid for (0) lasts forever
+			- USER-ID =
+			Ryan Peterman (CS35L HW) <RyanLPeterman@gmail.com>
+
+	2. Export public key into hw-pubkey.asc:
+		$ gpg --armor --output hw-pubkey.asc --export 'Ryan Peterman'
+	3. Make tarball of above files and zip it:
+		$ tar -cf hw.tar <files>
+		$ gzip hw.tar (creates hw.tar.gz)
+	4. Use private key to create a detached signature for tar:
+		$ gpg --armor --output hw.tar.gz.sig --detach-sign hw.tar.gz
+	5. Verify with:
+		$ gpg --verify hw.tar.gz.sig hw.tar.gz
+
+Questions:
+1. Suppose the other teams really had been observing all the bytes going across
+the network. Is your resulting network still secure? If so, explain why, and
+explain whether your answer would change if (1) you assumed the other teams
+had also tapped your keyboard and hard observed all of your team's keystrokes
+or (2) you are booting off USB and you assume the other teams temporarily 
+had physical control of the USB. If not, explain any weaknesses of your team's
+setups, focusing on possible attacks by such outside observers.
+
+	Yes, even if the other teams were observing all the bytes
+	going across the network, the network would still be secure
+	since the bytes going across the network are encrypted
+	prior to being sent across the network.
+
+	1) If the other team had also observed all of our keystrokes
+	then the bytes are not encrypted yet since they are getting the raw values
+	typed at that point and therefore the bytes are not secure since
+	they were observed before encryption. SSH does not protect the ends of the
+	communication link.
+
+	2) If the attackers temporarily had physical control of the USB we were
+	booting from, then we would be completely at risk since the bytes are not
+	encrypted yet they could have access to our private key which would let 
+	them decrypt everything.
+
+2. Explain why the gpg --verify command in the following instructions doesn't
+really verify that you personally created the tar file in question. How would
+you go about fixing this problem?
+
+	gpg --verify doesn't verify that I personally created the tar file in 
+	question it only verifies that the file was not altered in transit using
+	the hash. Therefore we would need a third party to maintain a list of the
+	people who own certain keys. As long as that third party is trusted then we
+	can use their input to tell if we are the owner of a certain key.

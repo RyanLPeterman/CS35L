@@ -1,0 +1,16 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+Upper Right Window: Shows the timestamp for the commit
+Upper Middle Window: Shows the author of the commit along with email
+Upper Left Window: Shows the layout of the list of commits
+	with additional information about merges and branches
+	
+Bottom Left Window: Shows a diff of the changes to the files
+Middle Left Window: Shows all information about a commit
+Bottom Right Window: Shows the files that were impacted by the commit
+
+Thus this allows us to visualize graphically what is inside of the git
+data structures in terms of the flow of the commits as well as the actual
+internals of the commits and their effects.

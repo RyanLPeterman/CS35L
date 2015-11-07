@@ -1,0 +1,51 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+Laboratory:
+
+	First to make sure we have the right software:
+		$ dpkg --get-selections | grep openssh
+
+		shows that I don't have the openssh-server:
+		$ sudo apt-get install openssh-server
+
+	Server Side:
+
+	1. Generate Public and Private Keys
+		$ ssh-keygen
+
+	2. Create an account for the client on the server:
+		$ sudo useradd -d /home/elton -m elton
+		$ sudo passwd elton
+			- then set password for login
+
+	3. Create .ssh directory for the new user
+		$ cd /home/elton
+		$ sudo mkdir .ssh
+
+	4. Change Ownership for ssh dir:
+		$ sudo chown -R elton .ssh
+		$ sudo chmod 700.ssh
+
+	Client Side:
+	1. Generate Public and Private Keys
+		$ ssh-keygen
+
+		- it asked for a place (kept as default)
+		- entered a passphrase
+
+	2. Copy your public key to the server:
+		$ ifconfig (to find ip address on partners computer)
+		$ ping 10.97.85.103 (to check connectivity)
+		$ ssh-copy-id -i elton@10.97.85.103 (elton 
+		was the name of the account on the server)
+
+	3. Add private key to authentication agent:
+		$ ssh-add
+
+	4. SSH to server:
+		$ ssh -X elton@10.97.85.103
+
+	5. Run firefox gui
+		$ firefox
