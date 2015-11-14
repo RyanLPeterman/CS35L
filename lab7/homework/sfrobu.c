@@ -1,17 +1,28 @@
-#include <stdio.h>	 // for print functions
-#include <stdlib.h>  // for malloc, realloc
-#include <stdbool.h> // for bool type
-#include <error.h>   // for exit
+#include <stdio.h>	  // for print functions for errors
+#include <stdlib.h>   // for malloc, realloc
+#include <stdbool.h>  // for bool type
+#include <error.h>    // for exit
+#include <unistd.h>   // for system calls
+#include <sys/stat.h> // for fstat
+#include <sys/types.h>// for struct members
 
 // Name: Ryan Peterman
 // UID: 704269982
 // Section: Lab 3
 
 // struct to contain char* while maintaining length information
+// length information us useful when allocating memory
 typedef struct {
 	int length;
 	char* string;
 } string;
+
+// for use in system calls
+const int m_stdin = 0;
+const int m_stdout = 1;
+
+// to print comparisons done in qsort
+int comparisons;
 
 // creates array of strings from stdin
 string* read_stdin_into_strings(int* num_strings);
@@ -25,13 +36,15 @@ int frob_cmp_wrapper(const void* a, const void* b);
 
 int main() {
 
+  comparisons = 0;
 	int* num_strings = (int*) malloc(sizeof(int));
+
   // return an array of strings with their accompanying lengths
   // and alters num_strings by reference
 	string* strings = read_stdin_into_strings(num_strings);
 
-  // had difficulty getting strings struct to work with qsort
-  // therefore in the interest of time use char* array instead
+  // using char* array now since cmp function doesnt need to know length of strings
+  // i.e. strings are space terminated and therefore inherently give length
   int i = 0;
   char** str_arr =  (char**) malloc(sizeof(char**) * (*num_strings));
 
@@ -93,6 +106,9 @@ int sfrob(const char* a, const char* b) {
 // wrapper function for compare
 int frob_cmp_wrapper(const void* a, const void* b) {
 
+  // comparison function was called by qsort
+  comparisons++;
+
   // cast pointers to be useable by sfrob
   const char * first = *(const char **) a;
   const char * second = *(const char **) b;
@@ -108,19 +124,34 @@ string* read_stdin_into_strings(int* num_strings)
   (*num_strings) = 0;
 
   char* buffer = (char*) malloc(capacity);
-  char next_byte;
+  char* next_byte = (char*) malloc(sizeof(char));
 
+  // flags
   bool eat_whitespace = true;
   bool last_byte_was_space = false;
+  bool not_only_whitespace = true;
+
+  struct stat file_stat;
+  fstat(m_stdin, &file_stat);
+
+  // if its a regular file
+  if(S_ISREG(file_stat.st_mode)) {
+    // update capacity variable so we don't realloc later
+    capacity = file_stat.st_size;
+
+    // allocate all the memory for the buffer up front
+    buffer = (char*) realloc(buffer, capacity);
+  }
 
   // loop through entire file
-  while ((next_byte = getchar()) != EOF) {
+  while (read(m_stdin, next_byte, 1)) {
   	
   	// eats all spaces prior to first nonspace character in stdin
-  	if(next_byte == ' ' && eat_whitespace) {
-  		while((next_byte = getchar()) == ' ') {
+  	if(*next_byte == ' ' && eat_whitespace) {
 
-  			if(next_byte == EOF) {
+  		while((not_only_whitespace = read(m_stdin, next_byte, 1)) && *next_byte == ' ') {
+
+  			if(!not_only_whitespace) {
   				fprintf(stderr, "Error: stdin only contained spaces");
   				exit(1);
   			}
@@ -130,7 +161,7 @@ string* read_stdin_into_strings(int* num_strings)
   		eat_whitespace = false;	
   	}
 
-    if(next_byte == ' ') {
+    if(*next_byte == ' ') {
     	if(!last_byte_was_space) {
 	    	(*num_strings)++;
 	    	last_byte_was_space = true;    		
@@ -138,14 +169,14 @@ string* read_stdin_into_strings(int* num_strings)
     	else // last byte was also a space
     		continue; // dont store multiple spaces
     }
-    else { //next_byte is a nonspace character 
+    else { //*next_byte is a nonspace character 
     	last_byte_was_space = false;
     	eat_whitespace = false;    	
     }
 
 
     // store in buffer
-    buffer[iter++] = next_byte;
+    buffer[iter++] = *next_byte;
 
     // if buffer full
     if (capacity == iter)
@@ -213,6 +244,7 @@ string* read_stdin_into_strings(int* num_strings)
 
   // free buffer
   free(buffer);
+  free(next_byte);
 
   return str_arr;
 }
@@ -229,12 +261,15 @@ void print_word_array(char** words, int num_strings) {
     char_index = 0;
 
     while((to_print = words[str_index][char_index]) != ' ') {
-      fprintf(stdout, "%c", to_print);
+      write(m_stdout, &to_print, 1);
       char_index++;
     }
 
+    to_print = ' ';
     // print out space we skipped over
-    fprintf(stdout, "%c", ' ');
+    write(m_stdout, &to_print, 1);
   }
 
+  // print comparisons as per spec
+  fprintf(stderr, "Comparisons: %d\n", comparisons);
 }

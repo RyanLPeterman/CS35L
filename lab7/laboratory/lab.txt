@@ -1,0 +1,13 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+Laboratory:
+
+1. Write tr2b.c
+
+2. Write tr2u.c
+
+3. Use strace command
+
+4. Use Time Command
