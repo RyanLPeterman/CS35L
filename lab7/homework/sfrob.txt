@@ -1,3 +1,81 @@
 Name: Ryan Peterman
 UID: 704269982
 Section : Lab 3
+
+1. Altered sfrobu.c by changing all getchar and putchar calls to 
+system calls read and write
+
+Added a global variable num_comparisons that is incremented in the qsort
+comparison function for output at the end
+
+added a call to S_ISREG(file_state.st_mode) that tells us if the file
+is a regular file. If it is a regular file then allocate all
+the space we need at the beginning so we do not need to call
+realloc later.
+
+2. With these alterations we use the time function to measure
+the performance differences between sfrob, sfrobu and sfrobs:
+
+	$ time sfrob < small_input.txt
+		real	0m0.002s
+		user	0m0.001s
+		sys		0m0.001s
+	$ time sfrobu < small_input.txt
+		real	0m0.003s
+		user	0m0.003s
+		sys		0m0.000s
+	$ time sfrobs < small_input.txt
+		real	0m0.013s
+		user	0m0.002s
+		sys	0m0.005s
+
+	$ time sfrob < medium_input.txt
+		real	0m0.003s
+		user	0m0.001s
+		sys		0m0.000s
+	$ time sfrobu < medium_input.txt
+		real	0m0.009s
+		user	0m0.001s
+		sys		0m0.008s
+	$ time sfrobs < medium_input.txt
+		real	0m0.008s
+		user	0m0.002s
+		sys		0m0.008s
+
+	$ time sfrob < large_input.txt
+		real	0m0.021s
+		user	0m0.009s
+		sys		0m0.002s
+	$ time sfrobu < large_input.txt
+		real	0m0.081s
+		user	0m0.010s
+		sys		0m0.070s
+	$ time sfrobs < large_input.txt
+		real	0m0.021s
+		user	0m0.017s
+		sys		0m0.004s
+
+This shows that in order of speed we have:
+	sfrob > sfrobs > sfrobu
+
+	The buffered version was fastest and the unbuffered
+	version was the slowest due to all the extra traps into the
+	OS for every byte read in and written.
+
+Each file consists of the same test case in lab5 except that the
+line is compied over 10 times for small, 100 times for medium, and
+1000 times for large.
+
+	10 lines --> 400 Comparisons
+		1 line = 4 comparisons
+	100 lines --> 6451 Comparisons
+		1 line = 6.45 comparisons
+	1000 lines --> 88808 Comparisons
+		1 line = 8.89 comparisons
+
+Therefore this data shows that with varying input lines 
+the number of comparisons is approximately 6.45 comparisons per line.
+
+However this linear approximation is an oversimpliciation. The true
+number of comparisons is going to scale with O(nlogn) since we are using
+qsort.

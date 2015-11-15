@@ -52,13 +52,14 @@ int main(int argc, char** argv) {
 		contains_translation[i] = false;
 	}
 
+
 	// populating lookup table
 	for(i = 0; i < len; i++) {
 		lookup_table[from[i]] = to[i];
 		contains_translation[from[i]] = true;
 	}
 
-	char* next_byte = malloc(sizeof(char));
+	int* next_byte = malloc(sizeof(int));
 	const int stdin = 0;
 	const int stdout = 1;
 
@@ -86,5 +87,5 @@ int str_len(const char* str) {
 		len++;
 	}
 
-	return len + 1;
+	return len;
 }

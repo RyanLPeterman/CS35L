@@ -4,10 +4,80 @@ Section: Lab 3
 
 Laboratory:
 
-1. Write tr2b.c
+1. Wrote tr2b.c that uses getchar and putchar which perform better since
+these calls use buffered IO (less traps into OS)
 
-2. Write tr2u.c
+2. Wrote tr2u.c that uses read and write syscalls which performs worse since 
+the program must trap into the OS on every call to read and write
+
+	Test Cases:
+		a. Simple Correctness (Compare to real tr)
+			$ ./tr2b abc def < test_file.txt
+		b. Incorrect Input
+			$ ./tr2b a b c
+		c. Set Length Mismatch
+			$ ./tr2b asdf wer
+		d. From Set Containing Duplicate
+			$ ./tr2b aabc poin
 
 3. Use strace command
+	
+	1. First we create a file that is 5MB large with the following:
+		$ head --bytes=5000000 /dev/urandom > big_file.txt
+		$ ls -l --block-size=MB big_file.txt    
+			-this verifies the file size is indeed large enough
 
-4. Use Time Command
+	2. Now we test the two scripts in two situations:
+		a. When copying one file to another:
+
+			$ strace -o strace_output.txt -c ./tr2b abc def < big_file.txt 
+			> output.txt
+				184 total system calls
+					77 write calls
+					79 read calls
+
+			$ strace -o strace_output.txt -c ./tr2u abc def < big_file.txt 
+			> output.txt
+				10000029 total system calls
+					5000001 write calls
+					5000002 read calls
+
+		b. When copying the file to terminal:
+			$ strace -o strace_output.txt -c ./tr2b abc def < big_file.txt
+
+				19944 total system calls
+					19837 write calls
+					79 read calls
+
+			$ strace -o strace_output.txt -c ./tr2u abc def < big_file.txt
+
+				10000029 total system calls
+					5000001 write calls
+					5000002 read calls
+
+4. Use the time command to compare how much faster one is with the following:
+
+	$ time cat big_file.txt | ./tr2b abc def > output.txt
+
+		real	0m0.186s
+		user	0m0.101s
+		sys		0m0.016s
+
+
+	$ time cat big_file.txt | ./tr2u abc def > output.txt
+
+		real	0m5.150s
+		user	0m0.250s
+		sys		0m4.880s
+
+Since cat is an extra program but it is constant across the two different
+tests, it does not affect the relative timing. Similarly, in order to not
+have to deal with the output to the screen I redirected the output to a text
+file.
+
+This increases the difference between the speed in the unbuffered and buffered
+versions since when writing to a file instead of stdout we can buffer the 
+write output as evidenced in the ./tr2b strace testing when outputting
+to terminal vs outputting to a file.
+
+This shows that buffered IO is much faster than unbuffered IO.

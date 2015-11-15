@@ -57,10 +57,11 @@ int main(int argc, char** argv) {
 		contains_translation[from[i]] = true;
 	}
 
-	char next_byte;
+	int next_byte;
 
 	// while there are characters in stdin 
 	while((next_byte = getchar()) != EOF) {
+
 		// if we have a translation
 		if(contains_translation[next_byte])
 			putchar(lookup_table[next_byte]);
@@ -83,5 +84,5 @@ int str_len(const char* str) {
 		len++;
 	}
 
-	return len + 1;
+	return len;
 }

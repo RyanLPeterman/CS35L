@@ -124,7 +124,7 @@ string* read_stdin_into_strings(int* num_strings)
   (*num_strings) = 0;
 
   char* buffer = (char*) malloc(capacity);
-  char* next_byte = (char*) malloc(sizeof(char));
+  int* next_byte = (int*) malloc(sizeof(int));
 
   // flags
   bool eat_whitespace = true;
@@ -180,7 +180,8 @@ string* read_stdin_into_strings(int* num_strings)
 
     // if buffer full
     if (capacity == iter)
-      buffer = (char*) realloc(buffer, capacity * 2);
+      capacity *= 2;
+      buffer = (char*) realloc(buffer, capacity);
   }
 
   // empty file case
