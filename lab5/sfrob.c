@@ -104,11 +104,11 @@ int frob_cmp_wrapper(const void* a, const void* b) {
 string* read_stdin_into_strings(int* num_strings) 
 {
   size_t capacity = 1024; // arbitrary size
-  size_t iter = 0;
+  int iter = 0;
   (*num_strings) = 0;
 
   char* buffer = (char*) malloc(capacity);
-  char next_byte;
+  int next_byte;
 
   bool eat_whitespace = true;
   bool last_byte_was_space = false;
@@ -143,13 +143,14 @@ string* read_stdin_into_strings(int* num_strings)
     	eat_whitespace = false;    	
     }
 
-
     // store in buffer
-    buffer[iter++] = next_byte;
+    buffer[iter] = next_byte;
+    iter++;
 
     // if buffer full
     if (capacity == iter)
-      buffer = (char*) realloc(buffer, capacity * 2);
+      capacity *= 2;
+      buffer = (char*) realloc(buffer, capacity);
   }
 
   // empty file case
@@ -161,7 +162,7 @@ string* read_stdin_into_strings(int* num_strings)
   // space terminate buffer if not already
   if(buffer[iter - 1] != ' ') {
   	// if buffer full add one byte
-    if (capacity == iter)
+    if (capacity == iter + 1)
       buffer = (char*) realloc(buffer, capacity + 1);
 
   	buffer[iter] = ' ';
