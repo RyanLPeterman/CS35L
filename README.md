@@ -13,7 +13,7 @@
 |   Lab 4   |    Finished	|             	
 |   Lab 5   |    Finished	|             	
 |   Lab 6   |    Finished	|             	
-|   Lab 7   | Not Assigned Yet 	|  
-|   Lab 8   | Not Assigned Yet 	|             	
-|   Lab 9   | Not Assigned Yet 	|             	
+|   Lab 7   |  	 Finished	|  
+|   Lab 8   | 	 Finished 	|             	
+|   Lab 9   | 	 Finished 	|             	
            	

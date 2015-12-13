@@ -1,0 +1,200 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+1. First I made the following hello world program:
+
+	#include <stdio.h> 
+
+	int main(){
+		printf("hello, world!\n");
+		return 0;
+	}
+
+	Compiled it with the following:
+		$gcc hello_world.c -o hello
+
+2. How we used the ldd command to see which libs we used:
+	$ ldd hello
+
+This gave the following:
+
+	linux-vdso.so.1 =>  (0x00007ffdc15d7000)
+	libc.so.6 => /lib64/libc.so.6 (0x0000003bc1c00000)
+	/lib64/ld-linux-x86-64.so.2 (0x0000003bc1800000)
+
+3. Now we use strace command to see the system calls:
+	$ strace -c hello
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+  0.00    0.000000           0         1           read
+  0.00    0.000000           0         1           write
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         3           fstat
+  0.00    0.000000           0         9           mmap
+  0.00    0.000000           0         3           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000000                    26         1 total
+
+
+The system calls that are related to dynamic linking here are open() to 
+open the shared library files, close to close the shared library files,
+and mmap to incorporate the library into the process' address space.
+
+4. Now we get a list of executables to investigate:
+
+	$ ls /usr/bin | awk 'NR%101==704269982%101' > exec_list.txt
+		- puts the list of executables into exec_list.txt
+
+5 & 6. Now we invoke ldd on every command in the list and we get a sorted
+list of all the libraries used in the commands:
+
+$ ./build_lib_usage.sh exec_list.txt | sed 's/=.*//' | sort -u > libraries.txt 
+	-where ./build_lib_usage calls ldd on every executable in the exec_list.txt
+	-sed removes all the text after = sign
+	-sort -u sorts all the dynamic libraries and removes uniques
+
+Below in exec_list.txt I have labeled the executables where ldd gave an 
+error message with reasoning.
+
+libraries.txt:
+
+	/lib64/ld-linux-x86-64.so.2 (0x00000033d2200000)
+	libatk-1.0.so.0 
+	libaudit.so.1 
+	libaugeas.so.0 
+	libavahi-client.so.3 
+	libavahi-common.so.3 
+	libbluetooth.so.3 
+	libcairo.so.2 
+	libcom_err.so.2 
+	libcrypto.so.10 
+	libcrypt.so.1 
+	libc.so.6 
+	libcups.so.2 
+	libdbus-1.so.3 
+	libdl.so.2 
+	libdmx.so.1 
+	libexpat.so.1 
+	libfa.so.1 
+	libfontconfig.so.1 
+	libfreebl3.so 
+	libfreetype.so.6 
+	libgcc_s.so.1 
+	libgconf-2.so.4 
+	libgcrypt.so.11 
+	libgdk_pixbuf-2.0.so.0 
+	libgdk-x11-2.0.so.0 
+	libgio-2.0.so.0 
+	libglib-2.0.so.0 
+	libgmodule-2.0.so.0 
+	libgnutls.so.26 
+	libgobject-2.0.so.0 
+	libgpg-error.so.0 
+	libgssapi_krb5.so.2 
+	libgthread-2.0.so.0 
+	libgtk-x11-2.0.so.0 
+	libhpip.so.0 
+	libhpmud.so.0 
+	libICE.so.6 
+	libjpeg.so.62 
+	libjson-c.so.2 
+	libk5crypto.so.3 
+	libkeyutils.so.1 
+	libkpathsea.so.4 
+	libkrb5.so.3 
+	libkrb5support.so.0 
+	liblcms.so.1 
+	libm.so.6 
+	libncurses.so.5 
+	libnetpbm.so.10 
+	libnetsnmp.so.20 
+	libopenjpeg.so.2 
+	libORBit-2.so.0 
+	libpango-1.0.so.0 
+	libpangocairo-1.0.so.0 
+	libpangoft2-1.0.so.0 
+	libpisock.so.9 
+	libpixman-1.so.0 
+	libpng12.so.0 
+	libpoppler.so.5 
+	libpopt.so.0 
+	libpthread.so.0 
+	libpython2.6.so.1.0 
+	libreadline.so.6 
+	libreport.so.0 
+	libresolv.so.2 
+	librt.so.1 
+	libselinux.so.1 
+	libSM.so.6 
+	libstdc++.so.6 
+	libtasn1.so.3 
+	libtiff.so.3 
+	libtinfo.so.5 
+	libusb-0.1.so.4 
+	libusb-1.0.so.0 
+	libutil.so.1 
+	libuuid.so.1 
+	libX11.so.6 
+	libX11-xcb.so.1 
+	libXau.so.6 
+	libxcb.so.1 
+	libXcomposite.so.1 
+	libXcursor.so.1 
+	libXdamage.so.1 
+	libXdmcp.so.6 
+	libXext.so.6 
+	libXfixes.so.3 
+	libXft.so.2 
+	libXinerama.so.1 
+	libXi.so.6 
+	libxml2.so.2 
+	libXpm.so.4 
+	libXrandr.so.2 
+	libXrender.so.1 
+	libXtst.so.6 
+	libXxf86dga.so.1 
+	libXxf86misc.so.1 
+	libXxf86vm.so.1 
+	libz.so.1 
+	linux-vdso.so.1 
+
+exec_list.txt:
+
+	abrt-action-analyze-python
+	autopoint (not a dynamic executable)
+	checkXML (not a dynamic executable)
+	cvt
+	doxytag
+	fax2tiff
+	gdbtui
+	gnome-network-properties
+	gsnd (not a dyanmic executable)
+	hpijs 
+	intltool-merge (not a dynamic executable)
+	kdeinit_wrapper 
+	ksplashx 
+	lprm
+	mft
+	mysql_setpermission (not a dynamic executable)
+	opimport
+	pamx 
+	pdfimages
+	pilot-memos
+	pnmtosgi
+	procmail
+	rarian-sk-rebuild (not a dynamic executable)
+	rpmdev-setuptree (not a dynamic executable)
+	sg 
+	ssh-copy-id (not a dynamic executable)
+	texconfig-sys (not a dynamic executable)
+	userpasswd (do not have permission to read)
+	xdpyinfo 
+	yum (not a dynamic executable)

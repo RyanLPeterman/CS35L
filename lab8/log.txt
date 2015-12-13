@@ -1,0 +1,69 @@
+Name: Ryan Peterman
+UID: 704269982
+Section: Lab 3
+
+1. First I added the correct location of the sort we want to PATH
+	$ export PATH=/usr/local/cs/bin:$PATH
+
+2. Now we generate the the large file of doubles with the following:
+
+	$ od -An -tf -N 80000000 < /dev/urandom | tr -s ' ' '\n' > big.txt
+		- 80,000,000 since we want 10million doubles
+		- using tr to remove whitespace and put a double on each line
+
+	$ wc -l big.txt
+		- this verifies we have 10million lines
+
+3. Now we time sort using 1, 2, 4, and 8 threads:
+
+	$ time -p sort -g --parallel=1 big.txt > /dev/null
+
+		real 177.53
+		user 177.35
+		sys 0.20
+
+
+	$ time -p sort -g --parallel=2 big.txt > /dev/null
+
+		real 94.45
+		user 180.29
+		sys 0.22
+
+
+	$ time -p sort -g --parallel=4 big.txt > /dev/null
+
+		real 53.23
+		user 180.35
+		sys 0.31
+
+	$ time -p sort -g --parallel=8 big.txt > /dev/null
+	
+		real 34.35
+		user 189.15
+		sys 0.38
+
+	Thus, this shows that using multiple threads in this sort 
+	improves its performance significantly.
+
+4. Then for fun I tried 16, 32, 64 threads:
+		Note: seasnet only has 16 cores
+
+	$ time -p sort -g --parallel=16 big.txt > /dev/null
+		real 30.34
+		user 298.32
+		sys 0.47
+
+	$ time -p sort -g --parallel=32 big.txt > /dev/null
+		real 29.99
+		user 300.20
+		sys 0.68
+
+	$ time -p sort -g --parallel=32 big.txt > /dev/null
+		real 29.50
+		user 302.98
+		sys 1.04
+
+	Expected the time to slow down more due to all the extra
+	overhead of managing threads that can't be run concurrently.
+	Stayed relatively the same timing even when I increased the 
+	number of threads to 1000 (added 5 seconds).
